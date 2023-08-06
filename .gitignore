@@ -32,3 +32,8 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Ansible
+long_introductions/infrastructure_as_code/ansible
+
+__queuestorage__
