@@ -14,8 +14,6 @@
 
   collections:
     - azure.azcollection
-  # roles:
-  #   - { role: azure.azure_modules }
 
   tasks:
     - name: Create resource group

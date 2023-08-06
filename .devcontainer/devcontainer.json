@@ -16,7 +16,7 @@
 		"ghcr.io/devcontainers-contrib/features/pulumi:1": {},
 		"ghcr.io/devcontainers-contrib/features/terraform-docs:1": {},
 		"ghcr.io/rchaganti/vsc-devcontainer-features/azurebicep:1": {}
-	}
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -28,7 +28,21 @@
 	// "postCreateCommand": "uname -a",
 
 	// Configure tool-specific properties.
-	// "customizations": {},
+	"customizations": {
+		"vscode": {
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"github.copilot",
+				"github.copilot-labs",
+				"github.copilot-chat",
+				"hashicorp.terraform",
+				"ms-azuretools.vscode-azureterraform",
+				"ms-azuretools.vscode-bicep",
+				"ms-python.python",
+				"ms-vscode.azurecli"
+			]
+		  }
+	}
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
