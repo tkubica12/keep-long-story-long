@@ -25,7 +25,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
+	"postCreateCommand": "ansible-galaxy collection install azure.azcollection; /usr/local/py-utils/venvs/ansible-core/bin/python -m pip install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt",
 
 	// Configure tool-specific properties.
 	"customizations": {
