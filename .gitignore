@@ -37,3 +37,7 @@ terraform.rc
 long_introductions/infrastructure_as_code/ansible
 
 __queuestorage__
+long_introductions/infrastructure_as_code/terraform/.terraform.lock.hcl
+
+*.pyc
+venv/
