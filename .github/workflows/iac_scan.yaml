@@ -11,6 +11,7 @@ jobs:
   terrascan_job:
     runs-on: ubuntu-latest
     name: terrascan-action
+    environment: demo
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2

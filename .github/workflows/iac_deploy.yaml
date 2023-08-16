@@ -9,6 +9,8 @@ on:
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
+    environment: demo
     permissions:
       id-token: write
       contents: write
