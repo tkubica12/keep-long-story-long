@@ -4,7 +4,7 @@ resource "azurerm_resource_group" "main" {
 }
 
 module "sql" {
-  source                  = "./modules/azuresql"
+  source                  = "github.com/tkubica12/keep-long-story-long//long_introductions/infrastructure_as_code/terraform_full_demo/modules/azuresql?ref=azuresql-v1.0.0"
   for_each                = fileset("${path.module}/databases", "*.yaml")
   sql_server_prefix       = element(split(".", each.key), 0)
   location                = azurerm_resource_group.main.location
