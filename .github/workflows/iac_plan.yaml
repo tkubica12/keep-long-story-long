@@ -1,4 +1,4 @@
-name: Get Terraform plan
+name: Generate Terraform plan
 on:
   workflow_dispatch:
   pull_request:
