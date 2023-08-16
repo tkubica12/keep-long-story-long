@@ -1,0 +1,33 @@
+name: Scan Terraform manifests
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'long_introductions/infrastructure_as_code/terraform_full_demo/**'
+
+jobs:
+  terrascan_job:
+    runs-on: ubuntu-latest
+    name: terrascan-action
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Run Terrascan
+      id: terrascan
+      uses: tenable/terrascan-action@main
+      with:
+        iac_type: 'terraform'
+        iac_version: 'v14'
+        policy_type: 'azure'
+        only_warn: false
+        sarif_upload: true
+        iac_dir: 'long_introductions/infrastructure_as_code/terraform_full_demo'
+        
+    - name: Upload SARIF file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: terrascan.sarif
+

@@ -39,6 +39,7 @@ Each database is represented by a map with the following keys:
 
 Here is full example:
 
+```
     mydemo1 = {
       db_name                 = "mydemo"
       sku                     = "S0"
@@ -54,6 +55,6 @@ Here is full example:
       sku                     = "S0"
       enable_private_endpoint = true
     }
-    
+``` 
 EOF
 }
