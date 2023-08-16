@@ -41,3 +41,4 @@ long_introductions/infrastructure_as_code/terraform/.terraform.lock.hcl
 
 *.pyc
 venv/
+long_introductions/infrastructure_as_code/terraform_full_demo/.terraform.lock.hcl
