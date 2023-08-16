@@ -25,9 +25,4 @@ jobs:
         only_warn: false
         sarif_upload: true
         iac_dir: 'long_introductions/infrastructure_as_code/terraform_full_demo'
-        
-    - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: terrascan.sarif
 
