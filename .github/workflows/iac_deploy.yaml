@@ -33,7 +33,7 @@ jobs:
         with:
           workflow: iac_plan.yaml
           workflow_conclusion: success
-          name: plan
+          name: tfplan
           path: ./long_introductions/infrastructure_as_code/terraform_full_demo
           check_artifacts:  false
           search_artifacts: false
