@@ -44,6 +44,7 @@ jobs:
         working-directory: ./long_introductions/infrastructure_as_code/terraform_full_demo
         run: terraform init
 
+
       - name: Terraform apply
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
