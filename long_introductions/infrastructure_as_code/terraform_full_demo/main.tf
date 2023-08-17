@@ -15,4 +15,6 @@ module "sql" {
   enable_private_endpoint = yamldecode(file("${path.module}/databases/${each.key}")).enable_private_endpoint
   subnet_id               = azurerm_subnet.main.id
   private_dns_zone_id     = azurerm_private_dns_zone.sql.id
+
+  depends_on = [ azurerm_role_assignment.key_vault ]
 }

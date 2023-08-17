@@ -1,0 +1,22 @@
+name: Lint Terraform manifests
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'long_introductions/infrastructure_as_code/terraform_full_demo/**'
+
+jobs:
+  terrascan_job:
+    runs-on: ubuntu-latest
+    name: tflint-action
+    environment: demo
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Check linting of Terraform files
+      uses: devops-infra/action-tflint@v0.3
+      with:
+        working-directory: ./long_introductions/infrastructure_as_code/terraform_full_demo
