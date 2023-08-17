@@ -18,3 +18,7 @@ module "sql" {
 
   depends_on = [ azurerm_role_assignment.key_vault ]
 }
+
+locals {
+  test = "something"
+}
