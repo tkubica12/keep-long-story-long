@@ -1,0 +1,47 @@
+name: Deploy infrastructure using Terraform
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'long_introductions/infrastructure_as_code/terraform_full_demo/**'
+    
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    environment: demo
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Download plan from artefacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: stage-plan.yml
+          workflow_conclusion: success
+          name: stage-plan
+          path: environments/stage/
+          check_artifacts:  false
+          search_artifacts: false
+
+      - name: Terraform Init
+        working-directory: ./long_introductions/infrastructure_as_code/terraform_full_demo
+        run: terraform init
+
+      - name: Terraform apply
+        working-directory: ./long_introductions/infrastructure_as_code/terraform_full_demo
+        run: |
+          cd environments/stage
+          terraform init
+          terraform apply -auto-approve  tfplan
