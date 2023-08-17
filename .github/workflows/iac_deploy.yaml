@@ -1,58 +1,55 @@
-name: Get Terraform plan
+name: Deploy infrastructure using Terraform
 on:
   workflow_dispatch:
-  pull_request:
+  push:
     branches:
       - main
     paths:
       - 'long_introductions/infrastructure_as_code/terraform_full_demo/**'
-
+    
 jobs:
-  deploy:
+  apply:
     runs-on: ubuntu-latest
     environment: demo
-    permissions:
-      id-token: write
-      contents: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        ref: ${{ github.head_ref }}
-        fetch-depth: 0
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: Install Azure cli
-      run: |
-        sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg
-        curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
-        AZ_REPO=$(lsb_release -cs)
-        echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
-        sudo apt-get update
-        sudo apt-get install -y azure-cli
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
-    - name: Azure Login
-      run: az login --identity
+      - name: Download plan from artefacts
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: iac_plan.yaml
+          workflow_conclusion: success
+          name: plan
+          path: ./long_introductions/infrastructure_as_code/terraform_full_demo
+          check_artifacts:  false
+          search_artifacts: false
 
-    - name: Install dependencies
-      run: sudo apt-get install -y unzip
+      - name: Terraform Init
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_USE_OIDC: true
+        working-directory: ./long_introductions/infrastructure_as_code/terraform_full_demo
+        run: terraform init
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_wrapper: false
 
-    - name: Terraform Init
-      working-directory: ./long_introductions/infrastructure_as_code/terraform_full_demo
-      run: terraform init -upgrade 
-
-    - name: Terraform Plan
-      working-directory: ./long_introductions/infrastructure_as_code/terraform_full_demo
-      run: |
-        terraform plan -out=tfplan  
-
-    - name: Store plan as artefact
-      uses: actions/upload-artifact@v2
-      with:
-        name: tfplan
-        path: tfplan
+      - name: Terraform apply
+        env:
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_USE_OIDC: true
+        working-directory: ./long_introductions/infrastructure_as_code/terraform_full_demo
+        run: terraform apply -auto-approve  tfplan

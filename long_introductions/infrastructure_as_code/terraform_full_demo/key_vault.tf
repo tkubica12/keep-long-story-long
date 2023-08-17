@@ -18,8 +18,6 @@ resource "azurerm_key_vault" "main" {
   purge_protection_enabled    = false
   enable_rbac_authorization   = true
   sku_name                    = "standard"
-  
-  depends_on = [ azurerm_role_assignment.key_vault ]
 }
 
 resource "azurerm_role_assignment" "key_vault" {

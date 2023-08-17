@@ -10,10 +10,14 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     environment: demo
+    permissions:
+      id-token: write
+      contents: write
     steps:
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.event.pull_request.head.ref }}
+        fetch-depth: 0
 
     - name: Render terraform docs README.md and push changes back to PR branch
       uses: terraform-docs/gh-actions@v1.0.0
