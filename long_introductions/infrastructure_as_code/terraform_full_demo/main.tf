@@ -16,7 +16,7 @@ module "sql" {
   subnet_id               = azurerm_subnet.main.id
   private_dns_zone_id     = azurerm_private_dns_zone.sql.id
 
-  depends_on = [ azurerm_role_assignment.key_vault ]
+  depends_on = [azurerm_role_assignment.key_vault]
 }
 
 locals {

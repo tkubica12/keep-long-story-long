@@ -1,0 +1,53 @@
+---
+- name: Create Azure resources
+  hosts: localhost
+  # connection: local
+  # gather_facts: no
+
+  vars:
+    rg_name: myResourceGroup
+    location: westeurope
+    vnet_name: myVnet
+    address_prefix: 10.0.0.0/16
+    nic_names:
+    - nic1
+    - nic2
+    - nic3
+
+  collections:
+    - azure.azcollection
+
+  tasks:
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: "{{ rg_name }}"
+        location: "{{ location }}"
+
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ rg_name }}"
+        name: "{{ vnet_name }}"
+        address_prefixes: "{{ address_prefix }}"
+
+    - name: Create subnet
+      azure_rm_subnet:
+        resource_group: "{{ rg_name }}"
+        name: sub1
+        address_prefix: "10.0.0.0/24"
+        virtual_network_name: "{{ vnet_name }}"
+
+    - name: Create subnet 2
+      azure_rm_subnet:
+        resource_group: "{{ rg_name }}"
+        name: sub2
+        address_prefix: "10.0.1.0/24"
+        virtual_network_name: "{{ vnet_name }}"
+
+    - name: Create NICs
+      azure_rm_networkinterface:
+        resource_group: "{{ rg_name }}"
+        name: "{{ item }}"
+        virtual_network_name: "{{ vnet_name }}"
+        subnet_name: sub1
+        state: absent
+      loop: "{{ nic_names }}"
