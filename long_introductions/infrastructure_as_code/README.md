@@ -169,3 +169,17 @@ flowchart TD
     tfplantest -. stored plan .-> deploytest[/Deploy to test env/];
     tfplanprod -. stored plan .-> deployprod[/Deploy to production - manuall trigger/];
 ```
+
+# Notes
+1. Create VNET with two subnets and one NIC using UI - how to repeat, document to others when UI is always changing, cannot simulate, different UI for changes etc.
+2. Azure CLI script -> better, but becomes ugly pretty fast (add building of NICs in a loop from array, input parameters), does write all the time (showcase locked resource), need to be in correct order, difficult to delete or recreate, difficult to version, modularize, no what-if
+3. Ansible as script on steroids - more readable, checks desired state, modularization, what-if, but still -> order matters, hard to delete, recreate, no state management
+4. Terraform - declarative solution for RG, VNET, subnets + add remote state
+5. Terraform vs. Bicep/CloudFormation vs. Pulumi/CDK vs. Crossplane
+6. Reusable modules as layers of abstraction -> SQL module
+7. Conditionals
+8. Loops
+9. YAML as inputs
+10. Environments, additional la, layers of abstraction, DRY, GitOps
+11. CI/CD, docs generation, linting, policy as code etc.
+12. Handmade vs. generated providers (azurerm and aws vs. azapi and awscc)
