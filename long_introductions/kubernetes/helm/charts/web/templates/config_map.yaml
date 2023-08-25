@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myconfigmap
+data:
+  MYVAR2: somemap
+  config.ini: |
+    [default]
+    someitem1: "Hello from the configmap"
+
+    [section1]
+    something: "Hello from the {{ .Values.mystring }}"

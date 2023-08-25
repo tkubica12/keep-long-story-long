@@ -1,0 +1,4 @@
+replicaCount: 5
+image:
+  tag: 1
+mystring: "myprod"

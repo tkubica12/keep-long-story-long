@@ -1,0 +1,54 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: my-azurefile
+provisioner: file.csi.azure.com
+allowVolumeExpansion: true
+mountOptions:
+ - dir_mode=0777
+ - file_mode=0777
+ - uid=0
+ - gid=0
+ - mfsymlinks
+ - cache=strict
+ - actimeo=30
+parameters:
+  skuName: Standard_ZRS
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-azurefile
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: my-azurefile
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: writer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: writer
+  template:
+    metadata:
+      labels:
+        app: writer
+    spec:
+      containers:
+      - name: writer
+        image: ubuntu
+        command: ["/bin/bash", "-c", "while true; do echo $HOSTNAME-$(date -u) >> /mnt/azure/out.txt; cat /mnt/azure/out.txt; sleep 15; done"]
+        volumeMounts:
+        - mountPath: /mnt/azure
+          name: volume
+      volumes:
+      - name: volume
+        persistentVolumeClaim:
+          claimName: my-azurefile

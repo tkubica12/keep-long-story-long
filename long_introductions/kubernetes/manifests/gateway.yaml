@@ -1,0 +1,169 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: GatewayClass
+metadata:
+  name: gw
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: gw
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  gatewayClassName: gw
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+    - name: https
+      protocol: HTTPS
+      hostname: web.demo.tkubica.biz
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+        - kind: Secret
+          name: eg-https
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-v1
+spec:
+  type: ClusterIP
+  selector:
+    app: web
+    version: v1
+  ports:
+  - port: 80
+    targetPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-v2
+spec:
+  type: ClusterIP
+  selector:
+    app: web
+    version: v2
+  ports:
+  - port: 80
+    targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-v1
+spec:
+  selector:
+    matchLabels:
+      app: web
+      version: v1
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v1
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/tkubica12/web:1
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-v2
+spec:
+  selector:
+    matchLabels:
+      app: web
+      version: v2
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: web
+        version: v2
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/tkubica12/web:2
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3000
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: web
+spec:
+  parentRefs:
+    - name: gw
+  hostnames:
+    - "web.demo.tkubica.biz"
+  rules:
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: web-v1
+          port: 80
+          weight: 90
+        # - group: ""
+        #   kind: Service
+        #   name: web-v2
+        #   port: 80
+        #   weight: 10
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: web-v2
+          port: 80
+          weight: 1
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+        - headers:
+            - name: usertype
+              value: beta
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: tkubica12@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-account-key
+    solvers:
+    - http01:
+        gatewayHTTPRoute:
+          parentRefs:
+          - kind: Gateway
+            name: gw
+            namespace: default

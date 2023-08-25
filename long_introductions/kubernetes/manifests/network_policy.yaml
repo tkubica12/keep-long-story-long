@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: green
+  labels:
+    color: green
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["/bin/sh", "-c", "tail -f /dev/null"]
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-blue
+  labels:
+    color: blue
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command: ["/bin/sh", "-c", "tail -f /dev/null"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nginx-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: nginx
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          color: green

@@ -1,0 +1,11 @@
+resources:
+  - ../../base
+
+namespace: test
+
+images:
+  - name: ghcr.io/tkubica12/web:1
+    newTag: "2"
+
+patches:
+  - patch_deployment.yaml

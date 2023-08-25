@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haters
+spec:
+  selector:
+    matchLabels:
+      app: haters
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: haters
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - haters
+            topologyKey: "topology.kubernetes.io/zone"
+      containers:
+      - name: web
+        image: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lovers
+spec:
+  selector:
+    matchLabels:
+      app: lovers
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: lovers
+    spec:
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - lovers
+              topologyKey: "kubernetes.io/hostname"
+            weight: 100
+      containers:
+      - name: web
+        image: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zoners
+spec:
+  selector:
+    matchLabels:
+      app: zoners
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: zoners
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - swedencentral-1
+      containers:
+      - name: web
+        image: nginx

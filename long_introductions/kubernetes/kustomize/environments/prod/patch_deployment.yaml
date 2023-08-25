@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 5
+  template:
+    spec:
+      containers:
+        - name: web
+          resources:
+            requests:
+              cpu: "100m"
