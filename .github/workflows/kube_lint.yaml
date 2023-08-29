@@ -1,0 +1,23 @@
+name: Lint Kubernetes manifests
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'long_introductions/kubernetes/**'
+
+jobs:
+  kubelint:
+    runs-on: ubuntu-latest
+    name: kubelint
+    environment: demo
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Scan repo with kube-linter
+      uses: stackrox/kube-linter-action@v1.0.4
+      with:
+        directory: long_introductions/kubernetes/helm/charts/web
+        format: plain

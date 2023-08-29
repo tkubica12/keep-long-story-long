@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stress
+spec:
+  selector:
+    matchLabels:
+      app: stress
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stress
+    spec:
+      containers:
+      - name: web
+        image: alexeiled/stress-ng
+        args: ["--cpu", "1", "--timeout", "999999s"]
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: 1
+          limits:
+            memory: "512Mi"
+            cpu: 1
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: stress-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: stress
+  minReplicas: 1
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50

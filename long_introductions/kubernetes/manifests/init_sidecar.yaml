@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: init-sidecar-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: init-sidecar-demo
+  template:
+    metadata:
+      labels:
+        app: init-sidecar-demo
+    spec:
+      containers:
+      - name: main-container
+        image: busybox
+        command: ["/bin/sh", "-c", "tail -f /data/my-file.txt"]
+        volumeMounts:
+        - name: data-volume
+          mountPath: /data
+      - name: sidecar-container
+        image: busybox
+        command: ["/bin/sh", "-c", "while true; do echo Hello from sidecar >> /data/my-file.txt; sleep 10; done"]
+        volumeMounts:
+        - name: data-volume
+          mountPath: /data
+      initContainers:
+      - name: init-container
+        image: busybox
+        command: ["/bin/sh", "-c", "echo 'work init' > /data/my-file.txt"]
+        volumeMounts:
+        - name: data-volume
+          mountPath: /data
+      volumes:
+      - name: data-volume
+        emptyDir: {}
