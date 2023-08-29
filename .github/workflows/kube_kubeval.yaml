@@ -17,7 +17,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Render manifests
-      run: helm template -f long_introductions/kubernetes/helm/environments/prod/values.yaml ./long_introductions/kubernetes/helm/charts/web > ./rendered/rendered.yaml
+      run: |
+        mkdir ./rendered
+        helm template -f long_introductions/kubernetes/helm/environments/prod/values.yaml ./long_introductions/kubernetes/helm/charts/web > ./rendered/rendered.yaml
 
     - name: test
       uses: desaintmartin/helm-kubeval-action@master
