@@ -12,7 +12,7 @@ spec:
     targetRevision: kubernetes
     path: long_introductions/kubernetes/helm/charts/web
     helm:
-      releaseName: cluster_configuration
+      releaseName: web-test
       valueFiles:
       - ../environments/test/values.yaml
 

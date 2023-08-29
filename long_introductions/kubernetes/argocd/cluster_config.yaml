@@ -12,7 +12,7 @@ spec:
     targetRevision: kubernetes
     path: long_introductions/kubernetes/helm/charts/cluster_configuration
     helm:
-      releaseName: cluster_configuration
+      releaseName: cluster-configuration
 
   destination:
     server: https://kubernetes.default.svc
