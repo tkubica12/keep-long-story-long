@@ -1,4 +1,4 @@
-name: Check Kubernetes manifests security
+name: Kubernetes - Checkov
 on:
   workflow_dispatch:
   pull_request:

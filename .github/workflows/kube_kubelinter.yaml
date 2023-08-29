@@ -1,4 +1,4 @@
-name: kubelinter
+name: Kubernetes - kubelinter
 on:
   workflow_dispatch:
   pull_request:
