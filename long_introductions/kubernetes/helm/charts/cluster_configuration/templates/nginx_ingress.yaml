@@ -13,7 +13,7 @@ spec:
       releaseName: nginx-ingress
   destination:
     server: https://kubernetes.default.svc 
-    namespace: shared-components
+    namespace: default
   syncPolicy:
     automated:
       prune: true

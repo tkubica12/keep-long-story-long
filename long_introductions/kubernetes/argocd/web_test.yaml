@@ -14,7 +14,7 @@ spec:
     helm:
       releaseName: web-test
       valueFiles:
-      - ../environments/test/values.yaml
+      - ../../environments/test/values.yaml
 
   destination:
     server: https://kubernetes.default.svc
