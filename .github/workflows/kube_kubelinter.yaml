@@ -1,4 +1,4 @@
-name: kubeinter
+name: kubelinter
 on:
   workflow_dispatch:
   pull_request:
@@ -16,8 +16,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Render manifests
+      run: helm template -f long_introductions/kubernetes/helm/environments/prod/values.yaml ./long_introductions/kubernetes/helm/charts/web > ./rendered/rendered.yaml
+
     - name: Scan repo with kube-linter
       uses: stackrox/kube-linter-action@v1.0.4
       with:
-        directory: long_introductions/kubernetes/helm/charts/web
+        directory: ./rendered
         format: plain

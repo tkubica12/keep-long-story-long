@@ -16,14 +16,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Render Kubernetes manifests
-      id: render
-      uses: bridgecrewio/k8s-render@master
-      with:
-        directory: long_introductions/kubernetes/helm/charts/web
+    - name: Render manifests
+      run: helm template -f long_introductions/kubernetes/helm/environments/prod/values.yaml ./long_introductions/kubernetes/helm/charts/web > ./rendered/rendered.yaml
 
     - name: Run Checkov action
       id: checkov
       uses: bridgecrewio/checkov-action@master
       with:
-        directory: long_introductions/kubernetes/helm/charts/web
+        framework: kubernetes
+        directory: ./rendered
