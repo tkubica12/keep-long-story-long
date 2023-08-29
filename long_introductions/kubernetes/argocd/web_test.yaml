@@ -1,24 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster
+  name: web-test
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/tkubica12/aks-as-a-service
-    targetRevision: main
-    path: charts/argocd_cluster
+    repoURL: https://github.com/tkubica12/keep-long-story-long
+    targetRevision: kubernetes
+    path: long_introductions/kubernetes/helm/charts/web
     helm:
-      releaseName: argocd-cluster
+      releaseName: cluster_configuration
       valueFiles:
-      - ../../../clusters/{{ .Values.cluster_name }}/manifest.yaml
+      - ../environments/test/values.yaml
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: shared-components
+    namespace: a-test
 
   syncPolicy:
     automated: # automated sync by default retries failed attempts 5 times with following delays between attempts ( 5s, 10s, 20s, 40s, 80s ); retry controlled using `retry` field.

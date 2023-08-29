@@ -1,3 +1,0 @@
-name: ArgoCD bootstrap
-version: 0.1.0
-description: A Helm chart for ArgoCD bootstrap
