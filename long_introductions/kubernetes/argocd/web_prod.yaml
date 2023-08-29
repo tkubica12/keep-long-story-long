@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/tkubica12/keep-long-story-long
-    targetRevision: kubernetes
+    targetRevision: main
     path: long_introductions/kubernetes/helm/charts/web
     helm:
       releaseName: web-prod
