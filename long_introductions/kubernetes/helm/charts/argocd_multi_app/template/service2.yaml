@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: service1
+  name: service2
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,9 +10,9 @@ spec:
   source:
     repoURL: https://github.com/tkubica12/keep-long-story-long
     targetRevision: kubernetes
-    path: long_introductions/kubernetes/helm/charts/service1
+    path: long_introductions/kubernetes/helm/charts/service2
     helm:
-      releaseName: service1
+      releaseName: service2
 
   destination:
     server: https://kubernetes.default.svc
