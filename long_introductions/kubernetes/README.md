@@ -26,7 +26,7 @@ Notes:
 
 15. Lifecycle - kill and see container restart, hang see container not repair -> set lifecycle probe, then demo readiness
 16. Init container - create files on volume, read in main container, write in sidecar
-17. HPA a cluster autoscaler
+17. HPA, requests a cluster autoscaler
 18. Affinity
 19. PV/PVC - output hostname and date to file and print to logs
 20. Security hardening - cluster (RBAC, policies, ...), network policies

@@ -4,7 +4,7 @@
 | --- | --- |
 | / | Returns 200 if healthy and ready, returns 200 after 15 seconds if healty but not ready, hangs if not healthy |
 | /health | Returns 200 if healthy, generates load and returns nothing if not |
-| /ready | Returns 200 if ready, returns 503 if not |
+| /readiness | Returns 200 if ready, returns 503 if not |
 | /setReady | Sets ready state to true |
 | /setNotReady | Sets ready state to false |
 | /kill | Kills app|
