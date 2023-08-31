@@ -3,4 +3,4 @@ val: ../prasatko/valid/images
 test: ../prasatko/test/images
 
 nc: 1
-names: ['prasatko']
+names: ['pig']

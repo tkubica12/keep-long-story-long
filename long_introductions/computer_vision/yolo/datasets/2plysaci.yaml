@@ -3,4 +3,4 @@ val: ../2plysaci/valid/images
 test: ../2plysaci/test/images
 
 nc: 2
-names: ['oslik', 'ovecka']
+names: ['donkey', 'sheep']
