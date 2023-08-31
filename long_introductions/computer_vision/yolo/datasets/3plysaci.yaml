@@ -1,0 +1,6 @@
+train: ../3plysaci/train/images
+val: ../3plysaci/valid/images
+test: ../3plysaci/test/images
+
+nc: 3
+names: ['oslik', 'ovecka', 'prasatko']
