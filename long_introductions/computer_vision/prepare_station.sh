@@ -27,7 +27,7 @@ git config --global user.name "Tomas Kubica"
 sudo apt install python3-pip -y
 
 # Install PyTorch and data samples
-pip3 install torch torchvision lightning matplotlib numpy pandas scikit-learn tensorboard torchsummary
+pip3 install torch torchvision lightning matplotlib numpy pandas scikit-learn tensorboard torchsummary ultralytics opencv-python
 
 # Install VSCode
 sudo snap install --classic code
@@ -36,4 +36,5 @@ code --install-extension github.copilot
 code --install-extension github.vscode-pull-request-github
 code --install-extension github.copilot-chat
 code --install-extension ms-python.python
+code --install-extension dvirtz.parquet-viewer
 
