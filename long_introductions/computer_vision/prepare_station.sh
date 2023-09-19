@@ -17,6 +17,7 @@ sudo apt install ubuntu-desktop -y
 sudo apt install xrdp -y
 sudo adduser xrdp ssl-cert
 sudo systemctl restart xrdp
+sudo systemctl enable xrdp
 
 # Clone repo
 git clone https://github.com/tkubica12/keep-long-story-long.git
@@ -27,7 +28,11 @@ git config --global user.name "Tomas Kubica"
 sudo apt install python3-pip -y
 
 # Install PyTorch and data samples
-pip3 install torch torchvision lightning matplotlib numpy pandas scikit-learn tensorboard torchsummary ultralytics opencv-python
+pip3 install torch torchvision torchtext lightning matplotlib numpy pandas scikit-learn tensorboard torchsummary ultralytics opencv-python tiktoken transformers ipywidgets
+
+# Install Anaconda
+curl --output anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2023.07-2-Linux-x86_64.sh
+bash anaconda.sh
 
 # Install VSCode
 sudo snap install --classic code
@@ -37,4 +42,3 @@ code --install-extension github.vscode-pull-request-github
 code --install-extension github.copilot-chat
 code --install-extension ms-python.python
 code --install-extension dvirtz.parquet-viewer
-
