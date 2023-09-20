@@ -80,3 +80,4 @@ Great! We now have direct access between VNETs therefore can seamlessly intercon
 # Remove peering
 az network vnet peering delete -n project1-to-project2 -g $prefix-project1 --vnet-name $prefix-project1
 az network vnet peering delete -n project2-to-project1 -g $prefix-project2 --vnet-name $prefix-project2
+```
