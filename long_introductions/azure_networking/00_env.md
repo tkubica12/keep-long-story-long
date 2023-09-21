@@ -1,5 +1,5 @@
 ```bash
-# COnfigure prifux
+# Configure prifux
 
 export prefix=klsl
 
@@ -9,4 +9,5 @@ az serial-console connect -n $prefix-front1 -g $prefix-project1
 az serial-console connect -n $prefix-front2 -g $prefix-project1 
 az serial-console connect -n $prefix-back -g $prefix-project1 
 az serial-console connect -n $prefix-vm -g $prefix-project2
+az serial-console connect -n $prefix-vpn -g $prefix-onprem
 ```

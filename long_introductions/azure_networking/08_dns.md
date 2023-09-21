@@ -81,4 +81,134 @@ az dns-resolver outbound-endpoint create -n dns-out \
 ```
 
 4. Enable DNS proxy on Azure Firewall
+
+```bash
+# Enable DNS proxy
+az network firewall policy update --name $prefix-fw-policy \
+    -g $prefix-central \
+    --dns-servers $(az dns-resolver inbound-endpoint show -n dns-in --dns-resolver-name resolver -g $prefix-shared --query ipConfigurations[0].privateIpAddress -o tsv) \
+    --enable-dns-proxy true
+```
+
 5. Point VNETs in ne to Azure Firewall as DNS server
+
+```bash
+firewall_ip=$(az network firewall show -n $prefix-fw -g $prefix-central --query hubIPAddresses.privateIPAddress -o tsv)
+az network vnet update -n $prefix-project1 -g $prefix-project1 --dns-servers $firewall_ip
+az network vnet update -n $prefix-project2 -g $prefix-project2 --dns-servers $firewall_ip
+```
+
+6. Test Azure zone
+
+```bash
+# Do this from jump
+export prefix=klsl
+dig $prefix-front1.azure.$prefix.internal
+dig $prefix-vm.azure.$prefix.internal
+```
+
+7. DNS forwarding to onprem
+
+```bash
+# Get Azure DNS resolver inbound IP
+az dns-resolver inbound-endpoint show -n dns-in --dns-resolver-name resolver -g $prefix-shared --query ipConfigurations[0].privateIpAddress -o tsv
+
+# Do this from onprem VM
+sudo -i
+
+export prefix=klsl
+export azure_dns_in_ip=10.254.0.4
+
+apt install bind9 -y
+
+cat > /etc/bind/named.conf.options << EOF
+options {
+        directory "/var/cache/bind";
+
+        // Forwarder to public DNS (eg. OpenDNS)
+        forwarders {
+                208.67.222.222;
+        };
+
+        listen-on port 53 { any; };
+        allow-query { any; };
+        recursion yes;
+
+        auth-nxdomain no;    # conform to RFC1035
+};
+
+# logging {
+#         channel default_log {
+#                 file "/var/log/bind/default.log";
+#                 print-time yes;
+#                 print-category yes;
+#                 print-severity yes;
+#                 severity info;
+#         };
+
+#         category default { default_log; };
+#         category queries { default_log; };
+# };
+EOF
+
+cat > /etc/bind/named.conf.local << EOF
+// onprem zone
+zone "onprem.$prefix.internal" {
+  type master;
+  file "/etc/bind/db.onprem";
+};
+
+// forward to Azure node for Azure zone
+zone "azure.$prefix.internal" {
+        type forward;
+        forwarders {$azure_dns_in_ip;};
+};
+EOF
+
+cat > /etc/bind/db.onprem << EOF
+\$TTL 60
+@            IN    SOA  localhost. root.localhost.  (
+                          2015112501   ; serial
+                          1h           ; refresh
+                          30m          ; retry
+                          1w           ; expiry
+                          30m)         ; minimum
+                   IN     NS    localhost.
+
+localhost       A   127.0.0.1
+myvm.onprem.$prefix.internal.    A       192.168.0.10
+EOF
+
+systemctl restart bind9
+
+# Configure DNS forwarding in Azure resolver
+az dns-resolver forwarding-ruleset create --name "myOnpremRules" \
+    --resource-group $prefix-shared \
+    --outbound-endpoints [{id:"$(az dns-resolver outbound-endpoint show --dns-resolver-name resolver -n dns-out -g $prefix-shared --query id -o tsv)"}]
+
+az dns-resolver forwarding-rule create --ruleset-name myOnpremRules \
+    -n onprem \
+    --resource-group $prefix-shared \
+    --domain-name "onprem.$prefix.internal." \
+    --forwarding-rule-state "Enabled" \
+    --target-dns-servers '[{"ipAddress":"192.168.0.10","port":53}]'
+
+az dns-resolver vnet-link create --ruleset-name "myOnpremRules" \
+    -n project1 \
+    -g $prefix-shared \
+    --id $(az network vnet show -n $prefix-project1 -g $prefix-project1 --query id -o tsv)
+
+az dns-resolver vnet-link create --ruleset-name "myOnpremRules" \
+    -n project2 \
+    -g $prefix-shared \
+    --id $(az network vnet show -n $prefix-project2 -g $prefix-project2 --query id -o tsv)
+
+az dns-resolver vnet-link create --ruleset-name "myOnpremRules" \
+    -n shared \
+    -g $prefix-shared \
+    --id $(az network vnet show -n $prefix-shared -g $prefix-shared --query id -o tsv)
+
+
+# Do this from jump VM
+dig myvm.onprem.$prefix.internal
+```
