@@ -1,0 +1,6 @@
+train: ../2plysaci/train/images
+val: ../2plysaci/valid/images
+test: ../2plysaci/test/images
+
+nc: 2
+names: ['donkey', 'sheep']
