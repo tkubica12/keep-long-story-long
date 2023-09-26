@@ -1,4 +1,4 @@
-# 08 - Using managed services mapped to internal network via Private Endpoint
+# 10 - Using managed services mapped to internal network via Private Endpoint
 Applications will likely use managed services - let's make those mapped to internal network via Private Endpoint.
 
 We will now create type of PaaS that runs on public endpoint - Azure Blob storage - and upload a file while allowing unauthenticated access to easily test things out.

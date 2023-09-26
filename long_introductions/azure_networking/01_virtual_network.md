@@ -27,7 +27,7 @@ az vm create -n $prefix-jump \
     --image Ubuntu2204 \
     --vnet-name $prefix-project1 \
     --subnet jump \
-    --size Standard_D2a_v4 \
+    --size Standard_B1s \
     --admin-username labuser \
     --admin-password Azure12345678 \
     --authentication-type password \
@@ -41,7 +41,7 @@ az vm create -n $prefix-front1 \
     --image Ubuntu2204 \
     --vnet-name $prefix-project1 \
     --subnet frontend \
-    --size Standard_D2a_v4 \
+    --size Standard_B1s \
     --admin-username labuser \
     --admin-password Azure12345678 \
     --authentication-type password \
@@ -55,7 +55,7 @@ az vm create -n $prefix-front2 \
     --image Ubuntu2204 \
     --vnet-name $prefix-project1 \
     --subnet frontend \
-    --size Standard_D2a_v4 \
+    --size Standard_B1s \
     --admin-username labuser \
     --admin-password Azure12345678 \
     --authentication-type password \
@@ -69,7 +69,7 @@ az vm create -n $prefix-back \
     --image Ubuntu2204 \
     --vnet-name $prefix-project1 \
     --subnet backend \
-    --size Standard_D2a_v4 \
+    --size Standard_B1s \
     --admin-username labuser \
     --admin-password Azure12345678 \
     --authentication-type password \

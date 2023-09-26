@@ -118,8 +118,8 @@ az serial-console connect -n $prefix-vpn -g $prefix-onprem
 sudo -i
 apt update
 apt install frr frr-doc strongswan -y
-export azureip=20.241.163.227   # Modify to fit yours!
-export azurebgppeer=10.0.2.13   # Modify to fit yours!
+export azureip=20.81.124.40   # Modify to fit yours!
+export azurebgppeer=10.0.2.12   # Modify to fit yours!
 
 cat > /etc/ipsec.conf << EOF
 config setup
