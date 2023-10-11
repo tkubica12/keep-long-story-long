@@ -55,7 +55,9 @@ pdf[pdf.age > 30].display()
 pdf.groupby(by=['department']).mean().display()
 ```
 
-9. Create dashboard - table and Bar chart
+8. Store query, add description, create alert
+   
+9.  Create dashboard - table and Bar chart
 
 10. Parquet and Delta
 ```sql
@@ -142,10 +144,201 @@ VACUUM deltaexample RETAIN 0 HOURS;
 
 11. Comment deep and shallow (copy on write) clones - currently limitations in Unity Catalog (only managed tables and in preview, no external locations)
 
-12. Ingesting - autoloader storage, SQL, Kafka
+-------------------
+Here use Terraform to create another storage account, 3 containers, SQL, EventHub and run generators to create and stream data.
+Create external locations in Databricks.
+-------------------
 
-13. More complex queries - silver/gold table JOINs
-14. Streaming with DLT
+12. Ingesting - autoloader storage, SQL, Kafka
+```python
+# Autoloader for users
+data_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/users/"
+checkpoint_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/_checkpoint/users"
+
+(spark.readStream
+  .format("cloudFiles")
+  .option("cloudFiles.format", "json")
+  .option("cloudFiles.schemaLocation", checkpoint_path)
+  .load(data_path)
+  .writeStream
+  .option("checkpointLocation", checkpoint_path)
+  .trigger(availableNow=True)
+  .toTable("main.demobronze.users"))
+
+# Autoloader for vipusers
+data_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/vipusers/"
+checkpoint_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/_checkpoint/vipusers"
+
+(spark.readStream
+  .format("cloudFiles")
+  .option("cloudFiles.format", "json")
+  .option("cloudFiles.schemaLocation", checkpoint_path)
+  .load(data_path)
+  .writeStream
+  .option("checkpointLocation", checkpoint_path)
+  .trigger(availableNow=True)
+  .toTable("main.demobronze.vipusers"))
+
+# Autoloader for products
+data_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/products/"
+checkpoint_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/_checkpoint/products"
+
+(spark.readStream
+  .format("cloudFiles")
+  .option("cloudFiles.format", "json")
+  .option("cloudFiles.schemaLocation", checkpoint_path)
+  .load(data_path)
+  .writeStream
+  .option("checkpointLocation", checkpoint_path)
+  .trigger(availableNow=True)
+  .toTable("main.demobronze.products"))
+
+# Use UI to check tables in demobronze schema (also known as database) in main catalog.
+# Note products history -> new data files are arriving and we can see transactions in table
+```
+
+```sql
+-- Create SQL cell to import data from Azure SQL
+
+-- Create table object on top of Azure SQL
+CREATE TABLE IF NOT EXISTS jdbc_orders
+USING org.apache.spark.sql.jdbc
+OPTIONS (
+   url "jdbc:sqlserver://{sqlservername}.database.windows.net:1433;database=orders",
+   database "orders",
+   dbtable "orders",
+   user "tomas",
+   password "{azuresql_password}"
+ );
+
+CREATE TABLE IF NOT EXISTS jdbc_items
+USING org.apache.spark.sql.jdbc
+OPTIONS (
+   url "jdbc:sqlserver://{sqlservername}.database.windows.net:1433;database=orders",
+   database "orders",
+   dbtable "items",
+   user "tomas",
+   password "{azuresql_password}"
+ );
+
+-- COMMAND ----------
+
+-- This can be queried now (direct query, basically on the fly translation)
+%sql
+SELECT * FROM jdbc_orders;
+
+-- COMMAND ----------
+%sql
+SELECT * FROM jdbc_items;
+
+-- COMMAND ----------
+-- Let's copy it to Delta table
+%sql
+CREATE OR REPLACE TABLE main.demobronze.orders
+AS SELECT * FROM jdbc_orders;
+
+CREATE OR REPLACE TABLE main.demobronze.items
+AS SELECT * FROM jdbc_items;
+```
+
+13.  More complex queries - silver/gold table JOINs
+```sql
+-- Goal: get count of unique products names per user based on orders and add flag to VIP users
+
+-- Select users
+SELECT users.id, users.user_name
+FROM main.demobronze.users
+
+-- Add is_vip flag by joining to vipusers
+SELECT users.id,
+       users.user_name,
+       iff(isnull(vipusers.id), false, true) AS is_vip
+FROM main.demobronze.users
+LEFT JOIN main.demobronze.vipusers ON users.id = vipusers.id
+
+-- Preparation - join users with orders
+SELECT users.id,
+       orders.orderId,
+       orders.userId
+FROM main.demobronze.users
+LEFT JOIN main.demobronze.orders ON users.id = orders.userId
+
+-- Preparation - join orders with items
+SELECT users.id,
+       orders.orderId,
+       orders.userId,
+       items.productId
+FROM main.demobronze.users
+LEFT JOIN main.demobronze.orders ON users.id = orders.userId
+LEFT JOIN main.demobronze.items ON orders.orderId = items.orderId
+
+-- Preparation - join items with products
+SELECT users.id,
+       products.name
+FROM main.demobronze.users
+LEFT JOIN main.demobronze.orders ON users.id = orders.userId
+LEFT JOIN main.demobronze.items ON orders.orderId = items.orderId
+LEFT JOIN main.demobronze.products ON items.productId = products.id
+
+-- Continue by joining previous query with this one
+SELECT users.id,
+       users.user_name,
+       products.name,
+       iff(isnull(vipusers.id), false, true) AS is_vip
+FROM main.demobronze.users
+LEFT JOIN main.demobronze.vipusers ON users.id = vipusers.id
+LEFT JOIN (
+  SELECT users.id,
+         products.name
+  FROM main.demobronze.users
+  LEFT JOIN main.demobronze.orders ON users.id = orders.userId
+  LEFT JOIN main.demobronze.items ON orders.orderId = items.orderId
+  LEFT JOIN main.demobronze.products ON items.productId = products.id
+  ) AS products ON users.id = products.id
+
+-- Almost there, just add dcount and group by
+SELECT users.id,
+       users.user_name,
+       COUNT(DISTINCT products.name) AS num_unique_products,
+       iff(isnull(vipusers.id), false, true) AS is_vip
+FROM main.demobronze.users
+LEFT JOIN main.demobronze.vipusers ON users.id = vipusers.id
+LEFT JOIN (
+  SELECT users.id,
+         products.name
+  FROM main.demobronze.users
+  LEFT JOIN main.demobronze.orders ON users.id = orders.userId
+  LEFT JOIN main.demobronze.items ON orders.orderId = items.orderId
+  LEFT JOIN main.demobronze.products ON items.productId = products.id
+  ) AS products ON users.id = products.id
+GROUP BY users.id, users.user_name, vipusers.id
+
+-- Final query to create table in gold
+CREATE OR REPLACE TABLE main.demogold.user_products
+AS
+SELECT users.id,
+       users.user_name,
+       COUNT(DISTINCT products.name) AS num_unique_products,
+       iff(isnull(vipusers.id), false, true) AS is_vip
+FROM main.demobronze.users
+LEFT JOIN main.demobronze.vipusers ON users.id = vipusers.id
+LEFT JOIN (
+  SELECT users.id,
+         products.name
+  FROM main.demobronze.users
+  LEFT JOIN main.demobronze.orders ON users.id = orders.userId
+  LEFT JOIN main.demobronze.items ON orders.orderId = items.orderId
+  LEFT JOIN main.demobronze.products ON items.productId = products.id
+  ) AS products ON users.id = products.id
+GROUP BY users.id, users.user_name, vipusers.id
+
+-- We can not query precalculated table and visualize
+SELECT * FROM main.demogold.user_products
+
+-- We can now create dashboard
+```
+
+14.  Streaming with DLT
 15. ML - data cleanup and preparation
 16. ML - model training and deployment
 17. Feature Store

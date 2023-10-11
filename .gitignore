@@ -45,3 +45,4 @@ long_introductions/infrastructure_as_code/terraform_full_demo/.terraform.lock.hc
 
 long_introductions/computer_vision/basics/data
 long_introductions/computer_vision/yolo/yolov8*.pt
+long_introductions/databricks/tf-datalake/.terraform.lock.hcl
