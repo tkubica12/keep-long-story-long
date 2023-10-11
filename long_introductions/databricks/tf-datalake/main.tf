@@ -50,3 +50,23 @@ module "data_lake" {
   ]
 }
 
+// Authorization to Event Hub for Databrics
+resource "azurerm_eventhub_authorization_rule" "pageviewsReceiver" {
+  name                = "pageviewsReceiver"
+  namespace_name      = module.data_lake.eventhub_namespace_name
+  resource_group_name = local.resource_group
+  eventhub_name       = module.data_lake.eventhub_name_pageviews
+  listen              = true
+  send                = false
+  manage              = false
+}
+
+resource "azurerm_eventhub_authorization_rule" "starsReceiver" {
+  name                = "starsReceiver"
+  namespace_name      = module.data_lake.eventhub_namespace_name
+  resource_group_name = local.resource_group
+  eventhub_name       = module.data_lake.eventhub_name_stars
+  listen              = true
+  send                = false
+  manage              = false
+}
