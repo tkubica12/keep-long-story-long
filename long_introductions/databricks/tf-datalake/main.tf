@@ -1,5 +1,5 @@
 locals {
-  resource_group = "databricks"
+  resource_group = "klsl"
   location       = "northeurope"
 }
 

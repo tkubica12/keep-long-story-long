@@ -164,8 +164,8 @@ Create external locations in Databricks.
 12. Ingesting - autoloader storage, SQL, Kafka
 ```python
 # Autoloader for users
-data_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/users/"
-checkpoint_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/_checkpoint/users"
+data_path = f"abfss://bronze@njkmbcdpugqm.dfs.core.windows.net/users/"
+checkpoint_path = f"abfss://bronze@njkmbcdpugqm.dfs.core.windows.net/_checkpoint/users"
 
 (spark.readStream
   .format("cloudFiles")
@@ -178,8 +178,8 @@ checkpoint_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/_checkpoint
   .toTable("main.demobronze.users"))
 
 # Autoloader for vipusers
-data_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/vipusers/"
-checkpoint_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/_checkpoint/vipusers"
+data_path = f"abfss://bronze@njkmbcdpugqm .dfs.core.windows.net/vipusers/"
+checkpoint_path = f"abfss://bronze@njkmbcdpugqm .dfs.core.windows.net/_checkpoint/vipusers"
 
 (spark.readStream
   .format("cloudFiles")
@@ -192,8 +192,8 @@ checkpoint_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/_checkpoint
   .toTable("main.demobronze.vipusers"))
 
 # Autoloader for products
-data_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/products/"
-checkpoint_path = f"abfss://bronze@hmeuljyuevdo.dfs.core.windows.net/_checkpoint/products"
+data_path = f"abfss://bronze@njkmbcdpugqm.dfs.core.windows.net/products/"
+checkpoint_path = f"abfss://bronze@njkmbcdpugqm.dfs.core.windows.net/_checkpoint/products"
 
 (spark.readStream
   .format("cloudFiles")

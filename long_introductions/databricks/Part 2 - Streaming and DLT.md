@@ -132,13 +132,13 @@ AS SELECT timestamp,
   get_json_object(CAST(value AS string), '$.client_ip') AS client_ip,
   get_json_object(CAST(value AS string), '$.user_agent') AS user_agent, 
   get_json_object(CAST(value AS string), '$.latency') AS latency 
-FROM STREAM(live.stream_pageviews)
+FROM STREAM(live.stream_pageviews);
 
 CREATE OR REFRESH STREAMING LIVE TABLE parsed_stars
 AS SELECT timestamp,
   get_json_object(CAST(value AS string), '$.user_id') AS user_id,
   get_json_object(CAST(value AS string), '$.stars') AS stars
-FROM STREAM(live.stream_stars)
+FROM STREAM(live.stream_stars);
 ```
 
 3.  Streaming with DLT - Processing
@@ -150,7 +150,7 @@ This is typical silver tier processing:
 CREATE OR REFRESH STREAMING LIVE TABLE high_latency
 AS SELECT *
 FROM STREAM(live.parsed_pageviews)
-WHERE latency > 4000
+WHERE latency > 4000;
 
 CREATE OR REFRESH STREAMING LIVE TABLE pageviews_stars_correlation
 AS SELECT live.parsed_pageviews.user_id,
@@ -163,7 +163,7 @@ AS SELECT live.parsed_pageviews.user_id,
 FROM STREAM(live.parsed_pageviews)
 JOIN STREAM(live.parsed_stars)
   ON live.parsed_pageviews.user_id = live.parsed_stars.user_id
-  AND DATEDIFF(MINUTE, live.parsed_pageviews.timestamp,live.parsed_stars.timestamp) BETWEEN 0 AND 15 
+  AND DATEDIFF(MINUTE, live.parsed_pageviews.timestamp,live.parsed_stars.timestamp) BETWEEN 0 AND 15 ;
 ```
 
 4.  Streaming with DLT - Gold table
