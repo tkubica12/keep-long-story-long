@@ -1,6 +1,6 @@
 # Part 2 - Streaming and DLT
 
-1.  Streaming with DLT - Ingesting
+### 1.  Streaming with DLT - Ingesting
 ```python
 # Get configuration parameters and secrets
 storage_account_name = ""
@@ -122,7 +122,7 @@ def stream_items():
 
 See tables in catalog and check data there. Note history on pageviews (a lot of changes - logs) and also check data pageviews - not readable, parsing is needed.
 
-2.  Streaming with DLT - Parsing
+### 2.  Streaming with DLT - Parsing
 ```sql
 CREATE OR REFRESH STREAMING LIVE TABLE parsed_pageviews
 AS SELECT timestamp,
@@ -141,7 +141,7 @@ AS SELECT timestamp,
 FROM STREAM(live.stream_stars);
 ```
 
-3.  Streaming with DLT - Processing
+### 3.  Streaming with DLT - Processing
 This is typical silver tier processing:
 - Preprocessed table with pageviews that experienced high latency
 - Correlate stars events from user that happen within 15 minutes of pageview -> users that gave stars after viewing our pages
@@ -166,7 +166,7 @@ JOIN STREAM(live.parsed_stars)
   AND DATEDIFF(MINUTE, live.parsed_pageviews.timestamp,live.parsed_stars.timestamp) BETWEEN 0 AND 15 ;
 ```
 
-4.  Streaming with DLT - Gold table
+### 4.  Streaming with DLT - Gold table
 ```sql
 CREATE OR REFRESH LIVE TABLE engagements
 AS

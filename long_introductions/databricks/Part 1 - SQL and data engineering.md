@@ -1,7 +1,7 @@
 # Part 1 - SQL and data engineering
 
-1. Create workspace
-2. Create storage, databricks container and bronze container and upload JSON
+### 1. Create workspace
+### 2. Create storage, databricks container and bronze container and upload JSON
 ```json
 {"name": "Martin", "department": "Marketing", "age": 37}
 {"name": "Jane", "department": "CEO", "age": 44}
@@ -9,12 +9,12 @@
 {"name": "Charles", "department": "Finance", "age": 62}
 ```
 
-1. Create access connector and give it access to storage
-2. Create metastore
-3. Create external location
-4. Create and start SQL warehouse
-5. Create and start Compute
-6. Short SQL demo
+### 3. Create access connector and give it access to storage
+### 4. Create metastore
+### 5. Create external location
+### 6. Create and start SQL warehouse
+### 6. Create and start Compute
+### 7. Short SQL demo
 ```sql
 SELECT *
 FROM JSON.`abfss://bronze@tomasdatalake541.dfs.core.windows.net/firsttry/data.json`
@@ -33,7 +33,8 @@ SELECT department, AVG(age) AS AverageAge
 FROM myviewttry/data.json
 GROUP BY department
 ```
-7.  Short PySpark demo
+
+### 8.  Short PySpark demo
 ```python
 df = spark.read \
     .format('json') \
@@ -48,7 +49,8 @@ df.filter(col("age") > 30).display()
 
 df.groupBy("department").avg("age").display()
 ```
-8.  Short Pandas demo
+
+### 9.  Short Pandas demo
 ```python
 # Classic Pandas DataFrame will be executed on single node
 # See number of tasks running
@@ -67,11 +69,11 @@ psdf[psdf.age > 30].display()
 psdf.groupby(by=['department']).mean().display()
 ```
 
-8. Store query, add description, create alert
+### 10. Store query, add description, create alert
    
-9.  Create dashboard - table and Bar chart
+### 11.  Create dashboard - table and Bar chart
 
-10. Parquet and Delta
+### 12. Parquet and Delta
 ```sql
 -- Create Parquet based table in external location
 -- We will keep it in bronze tier as we are not doing any transformations, cleanup or evaluation
@@ -154,7 +156,7 @@ VACUUM deltaexample RETAIN 0 HOURS;
 -- Go to Azure storage and observe files there again
 ```
 
-11. Comment deep and shallow (copy on write) clones - currently limitations in Unity Catalog (only managed tables and in preview, no external locations)
+### 13. Comment deep and shallow (copy on write) clones - currently limitations in Unity Catalog (only managed tables and in preview, no external locations)
 
 -------------------
 Here use Terraform to create another storage account, 3 containers, SQL, EventHub and run generators to create and stream data.
@@ -253,7 +255,7 @@ CREATE OR REPLACE TABLE main.demobronze.items
 AS SELECT * FROM jdbc_items;
 ```
 
-13.  More complex queries - silver/gold table JOINs
+### 14.  More complex queries - silver/gold table JOINs
 ```sql
 -- Goal: get count of unique products names per user based on orders and add flag to VIP users
 
